@@ -33,9 +33,9 @@ class ExamController extends Controller
             );
         } catch (\Exception $e) {
             return response()->json([
-                'msg' => 'fail',
+                'msg' => 'error',
                 'amount' => $e->getMessage(),
-            ]);
+            ], 422);
         }
 
         return response()->json([
