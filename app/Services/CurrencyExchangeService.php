@@ -37,7 +37,7 @@ class CurrencyExchangeService
         $convertedAmount = $amount * $this->currencies[$source][$target];
 
         // 回傳轉換後的金額(1. 四捨五入到小數點後兩位 2. 加上半形逗點作為千分位表示，每三個位數一點)
-        return number_format($convertedAmount, 2);
+        return number_format($convertedAmount, 2, '.', ',');
     }
 
 }
