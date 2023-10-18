@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Services\CurrencyExchangeService;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
