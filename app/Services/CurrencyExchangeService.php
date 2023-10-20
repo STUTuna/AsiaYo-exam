@@ -40,7 +40,7 @@ class CurrencyExchangeService
         // 移除千分位，並轉換成float
         $amount = floatval(str_replace(',', '', $amount));
 
-        // TODO: 輸入的數字需四捨五入到小數點第二位
+        // 輸入的數字需四捨五入到小數點第二位
         $amount = round($amount, 2);
 
         // 匯率換算 = 金額 * 匯率
