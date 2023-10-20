@@ -28,7 +28,7 @@ class CurrencyExchangeRequest extends FormRequest
             'target' => 'required|string',
             'amount' => array(
                 'required',
-                'regex:/^(?!,)(?:(?:\d{1,3}(?:,\d{3})*|\d+)$)/i',
+                'regex:/^(?!,)(?:(?:\d{1,3}(?:,\d{3})*|\d+)(?:\.\d+)?)$/i',
                 'min:0',
             ),
         ];
