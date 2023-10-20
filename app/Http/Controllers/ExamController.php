@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\UndefinedCurrencyException;
 use App\Http\Requests\CurrencyExchangeRequest;
 use App\Services\CurrencyExchangeService;
 
@@ -31,11 +32,13 @@ class ExamController extends Controller
                 $validated['target'],
                 $validated['amount']
             );
-        } catch (\Exception $e) {
+        } catch (UndefinedCurrencyException $e) {
             return response()->json([
                 'msg' => 'error',
-                'amount' => $e->getMessage(),
-            ], 422);
+                'errors' => [
+                    $e->getField() => [$e->getMessage()],
+                ],
+            ], $e->getCode());
         }
 
         return response()->json([
