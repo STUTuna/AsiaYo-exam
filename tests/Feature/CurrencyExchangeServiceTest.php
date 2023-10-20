@@ -7,9 +7,9 @@ use Tests\TestCase;
 class CurrencyExchangeServiceTest extends TestCase
 {
     /**
-     * 測試匯率換算
+     * 測試匯率換算，無千分位
      */
-    public function test_currencyExchange(): void
+    public function test_currencyExchange_without_thousands_separator(): void
     {
         // 定義測試資料
         $getData = [
@@ -28,6 +28,114 @@ class CurrencyExchangeServiceTest extends TestCase
                 'amount' => '111,801.00',
             ]);
     }
+
+    /**
+     * 測試匯率換算，有千分位
+     */
+    public function test_currencyExchange_with_thousands_separator(): void
+    {
+        // 定義測試資料
+        $getData = [
+            'source' => 'USD',
+            'target' => 'JPY',
+            'amount' => '1,000',
+        ];
+        // 透過http_build_query將陣列轉換成query string
+        $appendUrl = '?' . http_build_query($getData);
+        // 呼叫currencyExchange API
+        $response = $this->get('/currencyExchange' . $appendUrl);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'msg' => 'success',
+                'amount' => '111,801.00',
+            ]);
+    }
+
+    /**
+     * 測試匯率換算，有千分位，但是千分位位置不正確
+     */
+    public function test_currencyExchange_with_thousands_separator_in_wrong_position(): void
+    {
+        // 定義測試資料
+        $getData = [
+            'source' => 'USD',
+            'target' => 'JPY',
+            'amount' => '10,00',
+        ];
+        // 透過http_build_query將陣列轉換成query string
+        $appendUrl = '?' . http_build_query($getData);
+        // 呼叫currencyExchange API
+        $response = $this->get('/currencyExchange' . $appendUrl);
+
+        $response->assertStatus(422)
+            ->assertJson([
+                'msg' => 'error',
+                'errors' =>
+                [
+                    'amount' => [
+                        'The amount field format is invalid.',
+                    ],
+                ],
+            ]);
+    }
+
+    /**
+     * 測試匯率換算，有千分位，但是千分位位置在開頭
+     */
+    public function test_currencyExchange_with_thousands_separator_in_start(): void
+    {
+        // 定義測試資料
+        $getData = [
+            'source' => 'USD',
+            'target' => 'JPY',
+            'amount' => ',100',
+        ];
+        // 透過http_build_query將陣列轉換成query string
+        $appendUrl = '?' . http_build_query($getData);
+        // 呼叫currencyExchange API
+        $response = $this->get('/currencyExchange' . $appendUrl);
+
+        $response->assertStatus(422)
+            ->assertJson([
+                'msg' => 'error',
+                'errors' =>
+                [
+                    'amount' => [
+                        'The amount field format is invalid.',
+                    ],
+                ],
+            ]);
+    }
+
+    /**
+     * 測試匯率換算，有千分位，但是千分位位置在結尾
+     */
+    public function test_currencyExchange_with_thousands_separator_in_end(): void
+    {
+        // 定義測試資料
+        $getData = [
+            'source' => 'USD',
+            'target' => 'JPY',
+            'amount' => '100,',
+        ];
+        // 透過http_build_query將陣列轉換成query string
+        $appendUrl = '?' . http_build_query($getData);
+
+        // 呼叫currencyExchange API
+        $response = $this->get('/currencyExchange' . $appendUrl);
+        $response->assertStatus(422)
+            ->assertJson([
+                'msg' => 'error',
+                'errors' =>
+                [
+                    'amount' => [
+                        'The amount field format is invalid.',
+                    ],
+                ],
+            ]);
+    }
+
     /**
      * 若輸入的金額為非數字或無法辨認
      */
@@ -49,7 +157,7 @@ class CurrencyExchangeServiceTest extends TestCase
                 'msg' => 'error',
                 'errors' => [
                     'amount' => [
-                        'The amount field must be a number.',
+                        'The amount field format is invalid.',
                     ],
                 ],
             ]);
